@@ -1,4 +1,4 @@
-.welcome-screen {
+.layout {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -8,19 +8,3 @@
     background-color: #404040;
 }
 
-.game-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    width: 50vw;
-    height: calc(50vw / 1.54); /* height is width divided by 1.54 */
-    background-color: #404040;
-    padding: 20px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    border: antiquewhite 3px solid;
-}
-.welcome-message{
-    font-size: ;
-}

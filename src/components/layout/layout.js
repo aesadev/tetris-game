@@ -1,22 +1,33 @@
-import React from "react";
-import "./welcome-screen.css";
-import {findAllByDisplayValue} from "@testing-library/react";
+import React, {useState,} from "react";
+import "./layout.css";
+import GameplayScreen from "../gameplay-screen/gameplay-screen";
 
-const WelcomeScreen = ()=> {
-  return (
-  <div className="welcome-screen"  >
-      <WelcomeScreenTable></WelcomeScreenTable>
-  </div>
-  )
+const ComponentTypes = {
+    WelcomeScreenTable: 'WelcomeScreenTable',
+    GameplayScreen: 'GameplayScreen'
 }
-export default WelcomeScreen;
+const Layout = ()=> {
+    const [activeComponent, setActiveComponent] = useState(ComponentTypes.WelcomeScreenTable);
 
-const WelcomeScreenTable = ()=> {
+    switch (activeComponent) {
+        case ComponentTypes.WelcomeScreenTable:
+            return <WelcomeScreenTable setActiveComponent={setActiveComponent}/>;
+        case ComponentTypes.GameplayScreen:
+            return <GameplayScreen setActiveComponent={setActiveComponent} ComponentTypes={ComponentTypes}/>;
+        default:
+            return <WelcomeScreenTable setActiveComponent={setActiveComponent}/>;
+
+    }
+}
+export default Layout;
+
+const WelcomeScreenTable = ({setActiveComponent})=> {
+
     return (
         <div className="game-area">
             <div className="welcome-message">Welcome to the Tetris</div>
             <div className='buttons'>
-                <button>play</button>
+                <button onClick={() => setActiveComponent(ComponentTypes.GameplayScreen)}>play</button>
                 <button>help</button>
             </div>
             <div className="high-scores">
