@@ -1,23 +1,21 @@
-.game-board {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr); /* 10 sütun */
-    grid-template-rows: repeat(22, 1fr); /* 20 satır */
-    gap: 1px; /* Hücreler arası boşluk */
-    width: 200px; /* veya istediğiniz genişlik */
-    height: 400px; /* veya istediğiniz yükseklik */
-    background-color: black;
+.gameboard {
+    display: flex;
+    flex-direction: column;
 }
 
-.cell {
-    width: 100%;
-    height: 100%;
-    background-color: gray;
-    border: 1px solid darkgray;
+.row {
+    display: flex;
 }
 
-.edge-cell {
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    border: 1px solid darkgray;
+.empty {
+    background-color: gray; /* Boş hücreler için arkaplan rengi */
+    width: 20px; /* Hücrenin genişliği */
+    height: 20px; /* Hücrenin yüksekliği */
+    border: 1px solid #ddd; /* Hücre sınırı */
+}
+.filled {
+    background-color: black; /* Dolu hücreler için arkaplan rengi */
+    width: 20px; /* Hücrenin genişliği */
+    height: 20px; /* Hücrenin yüksekliği */
+    border: 1px solid #ddd; /* Hücre sınırı */
 }
