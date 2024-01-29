@@ -36,3 +36,14 @@ export const TETROMINOS = {
     ],
 }
 
+export const TETROMINO_COLORS = {
+    0: 'white', // Boş hücreler için renk
+    1: 'cyan',   // I Tetromino
+    2: 'blue',   // J Tetromino
+    3: 'orange', // L Tetromino
+    4: 'yellow', // O Tetromino
+    5: 'green',  // S Tetromino
+    6: 'purple', // T Tetromino
+    7: 'red',    //
+}
+
