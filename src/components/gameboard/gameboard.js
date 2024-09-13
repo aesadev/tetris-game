@@ -1,136 +1,96 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import './gameboard.css';
-import { TETROMINOS, TETROMINO_COLORS } from "./tetrominoes";
+import { useTetrisGame } from '../../hooks/useTetrisGame';
+import { TETROMINOS } from './tetrominoes';
 
-const createBoard = () => {
-    // Oyun tahtasını oluştur, her hücreyi (0, 'clear') ile doldurarak.
-    // 'clear' alanı, bir tetrominonun sabitlenip sabitlenmediğini kontrol etmek için kullanılacak.
-    return Array.from({ length: 20 }, () => Array(10).fill([0, 'clear']));
-};
+const GameBoard = ({ setScore }) => {
+	// Hook to manage the game state, such as board, current tetromino, and position
+	const {
+		board,
+		currentTetromino,
+		position,
+		moveTetromino,
+		rotateTetromino,
+		moveTetrominoDown,
+		gameOver,
+	} = useTetrisGame(setScore);
 
-const getRandomTetromino = () => {
-    const tetrominos = Object.keys(TETROMINOS);
-    const randomTetromino = Math.floor(Math.random() * tetrominos.length);
-    return {
-        ...TETROMINOS[tetrominos[randomTetromino]],
-        position: { x: 5 - Math.floor(TETROMINOS[tetrominos[randomTetromino]].shape[0].length / 2), y: 0 },
-        collided: false,
-    };
-};
+	// Drawing the game board with tetrominos
+	const drawBoard = () => {
+		const displayBoard = board.map((row) => row.map((cell) => cell)); // Copy the board
 
-const checkCollision = (tetromino, newPos, board) => {
-    for (let y = 0; y < tetromino.shape.length; y += 1) {
-        for (let x = 0; x < tetromino.shape[y].length; x += 1) {
-            // Tetrominonun bir kısmını kontrol et.
-            if (tetromino.shape[y][x] !== 0) {
-                if (
-                    // Oyun tahtasının sınırlarını kontrol et.
-                    !board[y + newPos.y] ||
-                    !board[y + newPos.y][x + newPos.x] ||
-                    // Çarpışma kontrolü yap.
-                    board[y + newPos.y][x + newPos.x][1] !== 'clear'
-                ) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-};
+		// Overlay the current falling tetromino onto the board
+		currentTetromino.shape.forEach((row, y) => {
+			row.forEach((value, x) => {
+				if (
+					value !== 0 &&
+					displayBoard[y + position.y] &&
+					displayBoard[y + position.y][x + position.x]
+				) {
+					displayBoard[y + position.y][x + position.x] = [
+						currentTetromino.type,
+						'clear',
+					]; // Assign the tetromino's type and mark it as 'clear'
+				}
+			});
+		});
 
-// GameBoard bileşeni
-const GameBoard = () => {
-    const [board, setBoard] = useState(createBoard());
-    const [currentTetromino, setCurrentTetromino] = useState(getRandomTetromino());
+		return displayBoard; // Return the complete display board with the tetromino overlaid
+	};
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            moveDown();
-        }, 1000); // Tetrominoyu her 1 saniyede bir aşağı taşı.
-        return () => clearInterval(interval);
-    }, [currentTetromino]);
+	// Handle key press events for controlling the game
+	useEffect(() => {
+		const handleKeyDown = (event) => {
+			if (gameOver) return; // Disable controls if the game is over
 
-    const moveDown = () => {
-        if (!checkCollision(currentTetromino, { x: 0, y: 1 }, board)) {
-            updateTetrominoPos({ x: 0, y: 1, collided: false });
-        } else {
-            // Eğer çarpışma varsa, yeni bir tetromino başlat.
-            if (currentTetromino.position.y < 1) {
-                console.error("Game Over");
-                // Oyunu sıfırla.
-                setBoard(createBoard());
-                return;
-            }
-            updateTetrominoPos({ x: 0, y: 0, collided: true });
-            setCurrentTetromino(getRandomTetromino());
-        }
-    };
+			switch (event.keyCode) {
+				case 37: // Left arrow
+					moveTetromino(-1);
+					break;
+				case 39: // Right arrow
+					moveTetromino(1);
+					break;
+				case 40: // Down arrow
+					moveTetrominoDown();
+					break;
+				case 38: // Up arrow (rotate)
+					rotateTetromino();
+					break;
+				default:
+					break;
+			}
+		};
 
-    const updateTetrominoPos = ({ x, y, collided }) => {
-        setCurrentTetromino(prev => ({
-            ...prev,
-            position: { x: (prev.position.x + x), y: (prev.position.y + y) },
-            collided,
-        }));
-    };
+		// Attach event listener for keyboard inputs
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown); // Clean up the event listener
+	}, [moveTetromino, rotateTetromino, moveTetrominoDown, gameOver]);
 
-    const sweepRows = newBoard =>
-        newBoard.reduce((ack, row) => {
-            if (row.findIndex(cell => cell[0] === 0) === -1) {
-                ack.unshift(new Array(newBoard[0].length).fill([0, 'clear']));
-                return ack;
-            }
-            ack.push(row);
-            return ack;
-        }, []);
+	return (
+		<div className="game-board">
+			{/* Render the board by mapping over the rows and cells */}
+			{drawBoard().map((row, y) =>
+				row.map((cell, x) => {
+					const cellValue = cell[0]; // Get the cell value (tetromino type)
+					const tetromino = TETROMINOS[cellValue]; // Get the tetromino details based on the type
 
-    const updateBoard = (prevBoard) => {
-        // Önce tahtayı temizle.
-        const newBoard = prevBoard.map(row =>
-            row.map(cell => (cell[1] === 'clear' ? [0, 'clear'] : cell))
-        );
+					// Get the color of the tetromino, default to 'transparent' if not found
+					const color = tetromino ? tetromino.color : 'transparent';
 
-        // Tetrominoyu tahtaya yerleştir.
-        currentTetromino.shape.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value !== 0) {
-                    newBoard[y + currentTetromino.position.y][x + currentTetromino.position.x] = [
-                        value,
-                        `${currentTetromino.collided ? 'merged' : 'clear'}`,
-                    ];
-                }
-            });
-        });
+					return (
+						<div
+							key={`${x}-${y}`} // Unique key for each cell
+							className="cell"
+							style={{ backgroundColor: color }} // Apply the color
+						></div>
+					);
+				})
+			)}
 
-        // Eğer tetromino çarpıştıysa, satırları temizle.
-        if (currentTetromino.collided) {
-            return sweepRows(newBoard);
-        }
-
-        return newBoard;
-    };
-
-    useEffect(() => {
-        setBoard(prev => updateBoard(prev));
-    }, [currentTetromino]);
-
-    return (
-        <div className="gameboard">
-            {board.map((row, y) => (
-                <div key={y} className="row">
-                    {row.map((cell, x) => (
-                        <div
-                            key={x}
-                            className={`cell ${cell[1]}`}
-                            style={{
-                                backgroundColor: cell[0] !== 0 ? TETROMINO_COLORS[cell[0]] : 'transparent',
-                            }}
-                        ></div>
-                    ))}
-                </div>
-            ))}
-        </div>
-    );
+			{/* Display 'Game Over' message if the game is over */}
+			{gameOver && <div className="game-over">Game Over</div>}
+		</div>
+	);
 };
 
 export default GameBoard;

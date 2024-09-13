@@ -1,0 +1,30 @@
+/* WelcomeScreen.css */
+.welcome-screen {
+    text-align: center;
+    padding: 50px;
+}
+
+.welcome-screen h1 {
+    font-size: 3em;
+    margin-bottom: 40px;
+}
+
+.buttons {
+    margin-bottom: 30px;
+}
+
+.buttons button {
+    margin: 0 15px;
+    padding: 15px 30px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.high-scores h2 {
+    margin-bottom: 10px;
+}
+
+.high-scores {
+    max-width: 400px;
+    margin: 0 auto;
+}

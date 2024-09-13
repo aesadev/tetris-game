@@ -1,9 +1,28 @@
-.game-container {
-
+/* GameplayScreen.css */
+.gameplay-screen {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
 }
 
-.Gameboard-container{
+.game-container {
+    width: 300px;
+    margin-right: 20px;
+}
+
+.sidebar {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+}
+
+.score {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.quit-button {
+    padding: 10px 20px;
+    font-size: 16px;
 }

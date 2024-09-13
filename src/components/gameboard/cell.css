@@ -1,0 +1,9 @@
+.cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #333;
+}
+
+.cell.filled {
+    background-color: #999; /* You can use different colors based on the tetromino type */
+}
